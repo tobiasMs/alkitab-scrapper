@@ -5,11 +5,12 @@ import time
 import argparse
 import requests
 import xml.etree.ElementTree as ET
+from bs4 import BeautifulSoup
 from pathlib import Path
 from xml.dom import minidom
 
 
-BASE_URL = "https://alkitab.sabda.org/api/passage.php"
+BASE_URL = "https://alkitab.mobi"
 VERSIONS = ["tb", "jawa"]
 
 
@@ -42,7 +43,7 @@ BOOKS = [
     {"no": 26, "abbr": "yeh", "name": "Yehezkiel", "chapter": 48},
     {"no": 27, "abbr": "dan", "name": "Daniel", "chapter": 12},
     {"no": 28, "abbr": "hos", "name": "Hosea", "chapter": 14},
-    {"no": 29, "abbr": "yol", "name": "Yoel", "chapter": 3},
+    {"no": 29, "abbr": "yoe", "name": "Yoel", "chapter": 3},
     {"no": 30, "abbr": "amo", "name": "Amos", "chapter": 9},
     {"no": 31, "abbr": "oba", "name": "Obaja", "chapter": 1},
     {"no": 32, "abbr": "yun", "name": "Yunus", "chapter": 4},
@@ -83,21 +84,53 @@ BOOKS = [
 ]
 
 
-def parse_sabda_xml(xml_text, book, chapter, version):
-    root = ET.fromstring(xml_text)
+def parse_alkitab_mobi_html(html_text, book, chapter, version):
+    soup = BeautifulSoup(html_text, "lxml")
+
+    # Cari container passage: div yang mengandung reftext span
+    first_ref = soup.find("span", class_="reftext")
+    passage_div = first_ref.parent.parent if first_ref else None
+
+    if passage_div is None:
+        return {
+            "book": book["name"],
+            "abbr": book["abbr"],
+            "chapter": chapter,
+            "version": version,
+            "verses": [],
+        }
 
     verses = []
+    current_title = None
 
-    for verse in root.findall(".//verse"):
-        number = verse.findtext("number")
-        text = verse.findtext("text") or ""
-        title = verse.findtext("title")
+    for p in passage_div.find_all("p"):
+        title_span = p.find("span", class_="paragraphtitle")
+        if title_span:
+            current_title = title_span.get_text(strip=True)
+            continue
+
+        ref_span = p.find("span", class_="reftext")
+        if not ref_span:
+            continue
+
+        a_tag = ref_span.find("a")
+        if not a_tag:
+            continue
+
+        name_attr = a_tag.get("name", "")
+        verse_num = int(name_attr[1:]) if name_attr.startswith("v") else None
+
+        # Ambil semua teks di <p>, buang nomor ayat di depannya
+        full_text = p.get_text(strip=True)
+        verse_num_text = ref_span.get_text(strip=True)
+        verse_text = full_text[len(verse_num_text):].strip()
 
         verses.append({
-            "verse": int(number) if number else None,
-            "text": text.strip(),
-            "title": title.strip() if title else None,
+            "verse": verse_num,
+            "text": verse_text,
+            "title": current_title,
         })
+        current_title = None
 
     return {
         "book": book["name"],
@@ -108,22 +141,23 @@ def parse_sabda_xml(xml_text, book, chapter, version):
     }
 
 
+
+def _title_abbr(abbr):
+    for i, c in enumerate(abbr):
+        if c.isalpha():
+            return abbr[:i] + abbr[i:].capitalize()
+    return abbr
+
+
 def fetch_chapter(book, chapter, version, timeout=20):
-    passage = f"{book['abbr']} {chapter}"
+    abbr = _title_abbr(book["abbr"])
+    url = f"{BASE_URL}/{version}/{abbr}/{chapter}/"
 
-    response = requests.get(
-        BASE_URL,
-        params={
-            "passage": passage,
-            "ver": version,
-        },
-        timeout=timeout,
-    )
-
+    response = requests.get(url, timeout=timeout)
     response.raise_for_status()
 
-    return parse_sabda_xml(
-        xml_text=response.text,
+    return parse_alkitab_mobi_html(
+        html_text=response.text,
         book=book,
         chapter=chapter,
         version=version,
