@@ -5,21 +5,21 @@
 <a name="english"></a>
 ## English
 
-# Alkitab Scrapper (SABDA API)
+# Alkitab Scrapper
 
-A Python-based tool to scrape Bible data from the [alkitab.sabda.org](https://alkitab.sabda.org) API. This script allows you to download full Bible versions (currently supporting TB and Jawa) in JSON and XML formats for offline use in your own applications.
+A Python-based tool to scrape Bible data from [alkitab.mobi](https://alkitab.mobi). Downloads full Bible versions (TB and Jawa) in JSON and XML formats for offline use.
 
-### 🌟 Features
-- **Multi-Version Support**: Scrapes both *Terjemahan Baru (TB)* and *Jawa* versions.
-- **Flexible Formats**: Export data to JSON, XML, or both.
-- **Rate Limiting**: Includes a configurable delay between requests to be polite to the SABDA servers.
-- **CLI & Module Ready**: Run it as a standalone script or import its functions into your project.
+### Features
+- **Multi-Version Support**: Scrapes *Terjemahan Baru (TB)* and *Jawa* versions.
+- **Flexible Formats**: Export to JSON, XML, or both.
+- **Rate Limiting**: Configurable delay between requests.
+- **CLI & Module Ready**: Run as a standalone script or import into your project.
 
-### 📋 Prerequisites
+### Prerequisites
 - Python 3.6+
-- `requests` library
+- `requests`, `beautifulsoup4`, `lxml`
 
-### 🚀 Installation
+### Installation
 1. Clone the repository:
    ```bash
    git clone https://github.com/your-username/alkitab-scrapper.git
@@ -27,51 +27,70 @@ A Python-based tool to scrape Bible data from the [alkitab.sabda.org](https://al
    ```
 2. Install dependencies:
    ```bash
-   pip install requests
+   pip install -r requirements.txt
    ```
 
-### 💻 Usage
+### Usage
 
-#### 1. Command Line Interface (CLI)
-Run the script directly from your terminal:
+#### 1. Command Line
 ```bash
-python scrapper.py --output my-data --delay 0.5 --format both
+python scrapper.py --output bible-data --delay 0.5 --format both
 ```
-**Arguments:**
-- `--output`: Folder name for the results (Default: `bible-data`).
-- `--delay`: Seconds to wait between chapter requests (Default: `0.3`).
-- `--format`: Output format (`json`, `xml`, or `both`).
 
-#### 2. Programmatic Usage (As a Library)
-You can import the scraper into your own Python scripts:
+| Argument | Default | Description |
+|---|---|---|
+| `--output` | `bible-data` | Output folder |
+| `--delay` | `0.3` | Seconds between requests |
+| `--format` | `both` | `json`, `xml`, or `both` |
 
+#### 2. Programmatic
 ```python
 from scrapper import scrape_version, scrape_all_versions
 
-# Option A: Scrape everything
-scrape_all_versions(output_dir="my_bible", delay=0.5, format_output="json")
+# Scrape all versions
+scrape_all_versions(output_dir="bible-data", delay=0.5, format_output="json")
 
-# Option B: Scrape a specific version only
-scrape_version(version="tb", output_dir="data", delay=0.2, format_output="xml")
+# Scrape a specific version only
+scrape_version(version="tb", output_dir="bible-data", delay=0.2, format_output="xml")
 ```
 
-### 📂 Data Structure
-The script generates a structured folder:
-- `books.json`: List of all Bible books with their abbreviations and chapter counts.
-- `[version]/`: Subfolder containing the full Bible data in your chosen format.
+### Output Structure
 
-**Example JSON structure:**
+```
+bible-data/
+├── books.json
+├── tb/
+│   ├── bible-tb.json
+│   └── bible-tb.xml
+└── jawa/
+    ├── bible-jawa.json
+    └── bible-jawa.xml
+```
+
+**JSON format:**
 ```json
 {
   "version": "tb",
   "books": [
     {
+      "no": 1,
       "name": "Kejadian",
+      "abbr": "kej",
+      "total_chapter": 50,
       "chapters": [
         {
           "chapter": 1,
           "verses": [
-            { "verse": 1, "text": "Pada mulanya Allah menciptakan langit dan bumi." }
+            {
+              "verse": 1,
+              "text": "Pada mulanya Allah menciptakan langit dan bumi.",
+              "title": "Allah menciptakan langit dan bumi serta isinya"
+            },
+            {
+              "verse": 2,
+              "text": "Bumi belum berbentuk dan kosong...",
+              "title": null
+            }
           ]
         }
       ]
@@ -79,79 +98,100 @@ The script generates a structured folder:
   ]
 }
 ```
+
+> `title` is the section heading. Only the first verse in a section has a title; subsequent verses have `null`.
 
 ---
 
 <a name="bahasa-indonesia"></a>
 ## Bahasa Indonesia
 
-# Alkitab Scrapper (SABDA API)
+# Alkitab Scrapper
 
-Alat berbasis Python untuk mengambil (scrape) data Alkitab dari API [alkitab.sabda.org](https://alkitab.sabda.org). Skrip ini memungkinkan Anda mengunduh versi Alkitab lengkap (saat ini mendukung TB dan Jawa) dalam format JSON dan XML untuk penggunaan offline di aplikasi Anda sendiri.
+Alat berbasis Python untuk mengambil data Alkitab dari [alkitab.mobi](https://alkitab.mobi). Mengunduh versi Alkitab lengkap (TB dan Jawa) dalam format JSON dan XML untuk penggunaan offline.
 
-### 🌟 Fitur
+### Fitur
 - **Dukungan Multi-Versi**: Mengambil versi *Terjemahan Baru (TB)* dan *Jawa*.
-- **Format Fleksibel**: Ekspor data ke JSON, XML, atau keduanya.
-- **Pembatasan Laju (Rate Limiting)**: Menyertakan delay yang dapat diatur antar permintaan agar lebih sopan terhadap server SABDA.
-- **Siap CLI & Modul**: Jalankan sebagai skrip mandiri atau impor fungsinya ke proyek Anda.
+- **Format Fleksibel**: Ekspor ke JSON, XML, atau keduanya.
+- **Rate Limiting**: Delay antar request yang dapat diatur.
+- **Siap CLI & Modul**: Jalankan sebagai skrip mandiri atau impor ke proyek Anda.
 
-### 📋 Prasyarat
+### Prasyarat
 - Python 3.6+
-- Pustaka `requests`
+- `requests`, `beautifulsoup4`, `lxml`
 
-### 🚀 Instalasi
-1. Klon repositori:
+### Instalasi
+1. Clone repositori:
    ```bash
-   git clone https://github.com/username-anda/alkitab-scrapper.git
+   git clone https://github.com/your-username/alkitab-scrapper.git
    cd alkitab-scrapper
    ```
-2. Instal dependensi:
+2. Install dependensi:
    ```bash
-   pip install requests
+   pip install -r requirements.txt
    ```
 
-### 💻 Penggunaan
+### Penggunaan
 
-#### 1. Antarmuka Baris Perintah (CLI)
-Jalankan skrip langsung dari terminal Anda:
+#### 1. Command Line
 ```bash
-python scrapper.py --output data-alkitab --delay 0.5 --format both
+python scrapper.py --output bible-data --delay 0.5 --format both
 ```
-**Argumen:**
-- `--output`: Nama folder untuk hasil (Default: `bible-data`).
-- `--delay`: Detik untuk menunggu antar permintaan pasal (Default: `0.3`).
-- `--format`: Format output (`json`, `xml`, atau `both`).
 
-#### 2. Penggunaan Programmatik (Sebagai Library)
-Anda dapat mengimpor scrapper ke dalam skrip Python Anda sendiri:
+| Argumen | Default | Keterangan |
+|---|---|---|
+| `--output` | `bible-data` | Folder output |
+| `--delay` | `0.3` | Jeda antar request (detik) |
+| `--format` | `both` | `json`, `xml`, atau `both` |
 
+#### 2. Programmatik
 ```python
 from scrapper import scrape_version, scrape_all_versions
 
-# Opsi A: Scrape semua versi
-scrape_all_versions(output_dir="alkitab_saya", delay=0.5, format_output="json")
+# Scrape semua versi
+scrape_all_versions(output_dir="bible-data", delay=0.5, format_output="json")
 
-# Opsi B: Scrape versi spesifik saja
-scrape_version(version="tb", output_dir="data", delay=0.2, format_output="xml")
+# Scrape versi tertentu saja
+scrape_version(version="tb", output_dir="bible-data", delay=0.2, format_output="xml")
 ```
 
-### 📂 Struktur Data
-Skrip ini menghasilkan folder terstruktur:
-- `books.json`: Daftar semua kitab Alkitab beserta singkatan dan jumlah pasalnya.
-- `[versi]/`: Subfolder berisi data Alkitab lengkap dalam format yang Anda pilih.
+### Struktur Output
 
-**Contoh struktur JSON:**
+```
+bible-data/
+├── books.json
+├── tb/
+│   ├── bible-tb.json
+│   └── bible-tb.xml
+└── jawa/
+    ├── bible-jawa.json
+    └── bible-jawa.xml
+```
+
+**Format JSON:**
 ```json
 {
   "version": "tb",
   "books": [
     {
+      "no": 1,
       "name": "Kejadian",
+      "abbr": "kej",
+      "total_chapter": 50,
       "chapters": [
         {
           "chapter": 1,
           "verses": [
-            { "verse": 1, "text": "Pada mulanya Allah menciptakan langit dan bumi." }
+            {
+              "verse": 1,
+              "text": "Pada mulanya Allah menciptakan langit dan bumi.",
+              "title": "Allah menciptakan langit dan bumi serta isinya"
+            },
+            {
+              "verse": 2,
+              "text": "Bumi belum berbentuk dan kosong...",
+              "title": null
+            }
           ]
         }
       ]
@@ -160,7 +200,9 @@ Skrip ini menghasilkan folder terstruktur:
 }
 ```
 
+> `title` adalah judul bagian/seksi. Hanya ayat pertama dalam satu seksi yang memiliki title; ayat-ayat berikutnya bernilai `null`.
+
 ---
 
 ### ⚠️ Disclaimer
-Project ini dibuat untuk tujuan edukasi. Pastikan Anda mematuhi kebijakan penggunaan data dari [alkitab.sabda.org](https://alkitab.sabda.org) sebelum menggunakan data ini untuk tujuan komersial. 
+Project ini dibuat untuk tujuan edukasi. Pastikan Anda mematuhi kebijakan penggunaan data dari [alkitab.mobi](https://alkitab.mobi) sebelum menggunakan data ini untuk tujuan komersial.
