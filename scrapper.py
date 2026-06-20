@@ -42,7 +42,7 @@ BOOKS = [
     {"no": 26, "abbr": "yeh", "name": "Yehezkiel", "chapter": 48},
     {"no": 27, "abbr": "dan", "name": "Daniel", "chapter": 12},
     {"no": 28, "abbr": "hos", "name": "Hosea", "chapter": 14},
-    {"no": 29, "abbr": "yol", "name": "Yoel", "chapter": 3},
+    {"no": 29, "abbr": "yoe", "name": "Yoel", "chapter": 3},
     {"no": 30, "abbr": "amo", "name": "Amos", "chapter": 9},
     {"no": 31, "abbr": "oba", "name": "Obaja", "chapter": 1},
     {"no": 32, "abbr": "yun", "name": "Yunus", "chapter": 4},
