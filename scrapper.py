@@ -34,7 +34,7 @@ BOOKS = [
     {"no": 18, "abbr": "ayb", "name": "Ayub", "chapter": 42},
     {"no": 19, "abbr": "maz", "name": "Mazmur", "chapter": 150},
     {"no": 20, "abbr": "ams", "name": "Amsal", "chapter": 31},
-    {"no": 21, "abbr": "pka", "name": "Pengkhotbah", "chapter": 12},
+    {"no": 21, "abbr": "pkh", "name": "Pengkhotbah", "chapter": 12},
     {"no": 22, "abbr": "kda", "name": "Kidung Agung", "chapter": 8},
     {"no": 23, "abbr": "yes", "name": "Yesaya", "chapter": 66},
     {"no": 24, "abbr": "yer", "name": "Yeremia", "chapter": 52},
